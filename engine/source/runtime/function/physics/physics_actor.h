@@ -14,7 +14,7 @@ namespace Pilot
     class PhysicsActor
     {
     public:
-        PhysicsActor(GObject* gobject, const Transform& global_transform);
+        PhysicsActor(std::weak_ptr<GObject> gobject, const Transform& global_transform);
         ~PhysicsActor();
 
         void createShapes(const std::vector<RigidBodyShape>& shape_defs, const Transform& global_transform);
@@ -48,17 +48,21 @@ namespace Pilot
         const std::vector<RigidBodyShape>& getShapes() const { return m_rigidbody_shapes; }
         Transform&                         getTransform() { return m_global_transform; }
 
-        GObject* getParentGO() const { return m_parent_object; }
+        std::weak_ptr<GObject> getParentGO() const { return m_parent_object; }
 
         void setActorType(int type) { m_actor_type = type; }
         int  getActorType() const { return m_actor_type; }
 
         void setGlobalTransform(const Transform& global_transform);
 
+        void setBodyID(uint32_t body_id) { m_body_id = body_id; }
+        uint32_t getBodyID() const { return m_body_id; }
+
     protected:
         std::vector<RigidBodyShape> m_rigidbody_shapes;
 
-        GObject*  m_parent_object {nullptr};
+        std::weak_ptr<GObject> m_parent_object;
+
         Transform m_global_transform;
 
         float m_inverse_mass {0.f};
@@ -74,5 +78,7 @@ namespace Pilot
         Matrix3x3 m_inverse_inertia_tensor;
 
         int m_actor_type {0};
+
+        uint32_t m_body_id{0xffffffff};
     };
 }; // namespace Pilot

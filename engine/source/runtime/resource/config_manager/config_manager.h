@@ -1,14 +1,29 @@
 #pragma once
 
-#include "runtime/engine.h"
-
 #include <filesystem>
 
 namespace Pilot
 {
-    class ConfigManager final : public PublicSingleton<ConfigManager>
+    struct EngineInitParams;
+
+    class ConfigManager
     {
-        friend class PublicSingleton<ConfigManager>;
+    public:
+        void initialize(const EngineInitParams& init_param);
+
+        const std::filesystem::path& getRootFolder() const;
+        const std::filesystem::path& getAssetFolder() const;
+        const std::filesystem::path& getSchemaFolder() const;
+        const std::filesystem::path& getEditorBigIconPath() const;
+        const std::filesystem::path& getEditorSmallIconPath() const;
+        const std::filesystem::path& getEditorFontPath() const;
+
+#ifdef ENABLE_PHYSICS_DEBUG_RENDERER
+        const std::filesystem::path& getJoltPhysicsAssetFolder() const;
+#endif
+
+        const std::string& getDefaultWorldUrl() const;
+        const std::string& getGlobalRenderingResUrl() const;
 
     private:
         std::filesystem::path m_root_folder;
@@ -18,25 +33,11 @@ namespace Pilot
         std::filesystem::path m_editor_small_icon_path;
         std::filesystem::path m_editor_font_path;
 
+#ifdef ENABLE_PHYSICS_DEBUG_RENDERER
+        std::filesystem::path m_jolt_physics_asset_folder;
+#endif
+
         std::string m_default_world_url;
         std::string m_global_rendering_res_url;
-
-    protected:
-        ConfigManager() = default;
-
-    public:
-        void initialize(const EngineInitParams& init_param);
-
-        void clear();
-
-        const std::filesystem::path& getRootFolder() const;
-        const std::filesystem::path& getAssetFolder() const;
-        const std::filesystem::path& getSchemaFolder() const;
-        const std::filesystem::path& getEditorBigIconPath() const;
-        const std::filesystem::path& getEditorSmallIconPath() const;
-        const std::filesystem::path& getEditorFontPath() const;
-
-        const std::string& getDefaultWorldUrl() const;
-        const std::string& getGlobalRenderingResUrl() const;
     };
 } // namespace Pilot

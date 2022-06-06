@@ -1,9 +1,12 @@
 #include "runtime/function/framework/world/world_manager.h"
 
 #include "runtime/core/base/macro.h"
-#include "runtime/function/framework/level/level.h"
+
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
+
+#include "runtime/function/framework/level/level.h"
+#include "runtime/function/global/global_context.h"
 
 #include "_generated/serializer/all_serializer.h"
 
@@ -14,7 +17,7 @@ namespace Pilot
     void WorldManager::initialize()
     {
         m_is_world_loaded   = false;
-        m_current_world_url = ConfigManager::getInstance().getDefaultWorldUrl();
+        m_current_world_url = g_runtime_global_context.m_config_manager->getDefaultWorldUrl();
     }
 
     void WorldManager::clear()
@@ -49,11 +52,22 @@ namespace Pilot
         }
     }
 
+    std::weak_ptr<PhysicsScene> WorldManager::getCurrentActivePhysicsScene() const
+    {
+        std::shared_ptr<Level> active_level = m_current_active_level.lock();
+        if (!active_level)
+        {
+            return std::weak_ptr<PhysicsScene>();
+        }
+
+        return active_level->getPhysicsScene();
+    }
+
     bool WorldManager::loadWorld(const std::string& world_url)
     {
         LOG_INFO("loading world: {}", world_url);
         WorldRes   world_res;
-        const bool is_world_load_success = AssetManager::getInstance().loadAsset(world_url, world_res);
+        const bool is_world_load_success = g_runtime_global_context.m_asset_manager->loadAsset(world_url, world_res);
         if (!is_world_load_success)
         {
             return false;
@@ -81,14 +95,17 @@ namespace Pilot
 
     bool WorldManager::loadLevel(const std::string& level_url)
     {
-        std::unique_ptr<Level> level(new Level);
-        const bool             is_level_load_success = level->load(level_url);
+        std::shared_ptr<Level> level = std::make_shared<Level>();
+        // set current level temporary
+        m_current_active_level       = level;
+
+        const bool is_level_load_success = level->load(level_url);
         if (is_level_load_success == false)
         {
             return false;
         }
 
-        m_loaded_levels.emplace(level_url, std::move(level));
+        m_loaded_levels.emplace(level_url, level);
 
         return true;
     }
