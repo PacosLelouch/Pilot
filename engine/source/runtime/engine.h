@@ -3,27 +3,22 @@
 #include <atomic>
 #include <chrono>
 #include <filesystem>
+#include <string>
 #include <unordered_set>
 
-namespace Pilot
+namespace Piccolo
 {
     extern bool                            g_is_editor_mode;
     extern std::unordered_set<std::string> g_editor_tick_component_types;
 
-    struct EngineInitParams
+    class PiccoloEngine
     {
-        std::filesystem::path m_root_folder;
-        std::filesystem::path m_config_file_path;
-    };
-
-    class PilotEngine
-    {
-        friend class PilotEditor;
+        friend class PiccoloEditor;
 
         static const float k_fps_alpha;
 
     public:
-        void startEngine(const EngineInitParams& param);
+        void startEngine(const std::string& config_file_path);
         void shutdownEngine();
 
         void initialize();
@@ -47,8 +42,6 @@ namespace Pilot
         float calculateDeltaTime();
 
     protected:
-        EngineInitParams m_init_params;
-
         bool m_is_quit {false};
 
         std::chrono::steady_clock::time_point m_last_tick_time_point {std::chrono::steady_clock::now()};
@@ -58,4 +51,4 @@ namespace Pilot
         int   m_fps {0};
     };
 
-} // namespace Pilot
+} // namespace Piccolo

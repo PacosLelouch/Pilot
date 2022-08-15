@@ -11,7 +11,7 @@
 
 #include "_generated/serializer/all_serializer.h"
 
-namespace Pilot
+namespace Piccolo
 {
     class AssetManager
     {
@@ -20,10 +20,11 @@ namespace Pilot
         bool loadAsset(const std::string& asset_url, AssetType& out_asset) const
         {
             // read json file to string
-            std::ifstream asset_json_file(getFullPath(asset_url));
+            std::filesystem::path asset_path = getFullPath(asset_url);
+            std::ifstream asset_json_file(asset_path);
             if (!asset_json_file)
             {
-                LOG_ERROR("open file: {} failed!", asset_url);
+                LOG_ERROR("open file: {} failed!", asset_path.generic_string());
                 return false;
             }
 
@@ -68,4 +69,4 @@ namespace Pilot
         std::filesystem::path getFullPath(const std::string& relative_path) const;
 
     };
-} // namespace Pilot
+} // namespace Piccolo

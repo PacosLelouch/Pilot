@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-namespace Pilot
+namespace Piccolo
 {
     class RHI;
     class RenderResourceBase;
@@ -14,6 +14,7 @@ namespace Pilot
 
     struct RenderPipelineInitInfo
     {
+        bool                                enable_fxaa {false};
         std::shared_ptr<RenderResourceBase> render_resource;
     };
 
@@ -46,4 +47,4 @@ namespace Pilot
         std::shared_ptr<RenderPassBase> m_combine_ui_pass;
         std::shared_ptr<RenderPassBase> m_pick_pass;
     };
-} // namespace Pilot
+} // namespace Piccolo

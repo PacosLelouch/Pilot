@@ -17,14 +17,14 @@
 #include "runtime/function/render/render_system.h"
 #include "runtime/function/render/window_system.h"
 
-namespace Pilot
+namespace Piccolo
 {
     RuntimeGlobalContext g_runtime_global_context;
 
-    void RuntimeGlobalContext::startSystems(const EngineInitParams& init_params)
+    void RuntimeGlobalContext::startSystems(const std::string& config_file_path)
     {
         m_config_manager = std::make_shared<ConfigManager>();
-        m_config_manager->initialize(init_params);
+        m_config_manager->initialize(config_file_path);
 
         m_file_system = std::make_shared<FileSystem>();
 
@@ -79,4 +79,4 @@ namespace Pilot
 
         m_config_manager.reset();
     }
-} // namespace Pilot
+} // namespace Piccolo
