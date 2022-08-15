@@ -76,17 +76,37 @@ namespace Pilot
 
         hits.clear();
 
-        // side pass
-        //if (physics_scene->sweep(
-        //    m_rigidbody_shape,
-        //    /**** [0] ****/,
-        //    /**** [1] ****/,
-        //    /**** [2] ****/,
-        //    hits))
-        //{
-        //    final_position += /**** [3] ****/;
-        //}
-        //else
+        // side pass DONE
+        float horizontal_length = horizontal_displacement.length();
+
+        if (physics_scene->sweep(
+            m_rigidbody_shape,
+            world_transform.getMatrix()/**** [0] ****/,
+            horizontal_direction/**** [1] ****/,
+            horizontal_length/**** [2] ****/,
+            hits))
+        {
+            Vector3 horizontal_hit_normal = Vector3(hits[0].hit_normal.x, hits[0].hit_normal.y, 0.0f);
+            float remaining_length = horizontal_length - hits[0].hit_distance;
+            float horizontal_cos = horizontal_direction.dotProduct(horizontal_hit_normal);
+            Vector3 horizontal_slide_vector = horizontal_direction - horizontal_hit_normal * horizontal_cos;
+
+            final_position += hits[0].hit_distance * horizontal_direction/**** [3] ****/;
+
+            Transform second_world_transform = world_transform;
+            second_world_transform.m_position += Math::max(0.0f, hits[0].hit_distance - 0.25f) * horizontal_direction;
+            std::vector<PhysicsHitInfo> second_hits;
+            if (horizontal_slide_vector.length() > 0.0f && (!physics_scene->sweep(
+                m_rigidbody_shape,
+                second_world_transform.getMatrix()/**** [0] ****/,
+                horizontal_slide_vector.normalisedCopy()/**** [1] ****/,
+                remaining_length * horizontal_slide_vector.length()/**** [2] ****/,
+                second_hits) || second_hits[0].body_id == hits[0].body_id))
+            {
+                final_position += horizontal_slide_vector * remaining_length;
+            }
+        }
+        else
         {
             final_position += horizontal_displacement;
         }
